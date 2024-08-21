@@ -1,0 +1,54 @@
+import tkinter as tk
+import time
+import math
+
+class AnalogClock:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Analog Clock")
+        self.canvas = tk.Canvas(root, width=400, height=400, bg='white')
+        self.canvas.pack()
+        self.center_x = 200
+        self.center_y = 200
+        self.radius = 100
+        self.update_clock()
+
+    def update_clock(self):
+        self.canvas.delete("all")
+        self.draw_clock_face()
+        self.draw_hands()
+        self.root.after(1000, self.update_clock)
+
+    def draw_clock_face(self):
+        self.canvas.create_oval(self.center_x - self.radius, self.center_y - self.radius,
+                                self.center_x + self.radius, self.center_y + self.radius)
+        for i in range(12):
+            angle = math.radians(i * 30)
+            x = self.center_x + self.radius * 0.8 * math.sin(angle)
+            y = self.center_y - self.radius * 0.8 * math.cos(angle)
+            self.canvas.create_text(x, y, text=str(i+1), font=('Arial', 14, 'bold'))
+
+    def draw_hands(self):
+        current_time = time.localtime()
+        hour = current_time.tm_hour % 12
+        minute = current_time.tm_min
+        second = current_time.tm_sec
+
+        # Hour hand
+        self.draw_hand((hour + minute / 60) * 30, self.radius * 0.5, 6)
+
+        # Minute hand
+        self.draw_hand(minute * 6, self.radius * 0.7, 4)
+
+        # Second hand
+        self.draw_hand(second * 6, self.radius * 0.9, 2)
+
+    def draw_hand(self, angle_in_degrees, length, width):
+        angle = math.radians(angle_in_degrees)
+        x = self.center_x + length * math.sin(angle)
+        y = self.center_y - length * math.cos(angle)
+        self.canvas.create_line(self.center_x, self.center_y, x, y, width=width, fill='black')
+
+root = tk.Tk()
+clock = AnalogClock(root)
+root.mainloop()
